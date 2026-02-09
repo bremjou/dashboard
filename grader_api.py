@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import boto3
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -45,7 +46,7 @@ def health_check():
     try:
         s3 = boto3.client('s3', region_name='us-east-1')
         buckets = s3.list_buckets()
-        lks_buckets = [b for b in buckets['Buckets'] if 'lks-orders' in b['Name']]
+        lks_buckets = [b for b in buckets['Buckets'] if 'lks-orders-archive' in b['Name']]
         results['checks']['s3'] = {
             'status': 'PASS' if len(lks_buckets) > 0 else 'FAIL',
             'message': f"Found {len(lks_buckets)} LKS bucket(s)"
@@ -75,8 +76,7 @@ def health_check():
             'message': f"Found {len(lks_functions)} Lambda function(s)"
         }
     except Exception as e:
-        results['checks']['lambda'] 
-        = {'status': 'ERROR', 'message': str(e)}
+        results['checks']['lambda'] = {'status': 'ERROR', 'message': str(e)}
     
     # Overall Status
     all_pass = all(check['status'] == 'PASS' for check in results['checks'].values())
