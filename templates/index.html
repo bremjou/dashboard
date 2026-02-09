@@ -292,12 +292,6 @@
                         throw new Error(data.error);
                     }
                 })
-                .catch(error => {
-                    // Karena tidak ada backend server asli, ini pasti akan error.
-                    // Saya tambahkan DEMO DATA supaya dashboard terlihat bagus saat dijalankan
-                    console.log("Menggunakan Data Demo karena Fetch Gagal");
-                    useDemoData();
-                });
         }
 
 
@@ -360,4 +354,5 @@
     </script>
 </body>
 </html>
+
 
