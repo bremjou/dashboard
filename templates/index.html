@@ -6,16 +6,22 @@
     <title>LKS Dashboard | Loading Integration</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- 1. GLOBAL VARIABLES & DASHBOARD STYLES --- */
+        /* --- 1. GLOBAL VARIABLES & DASHBOARD STYLES (CHEERFUL THEME) --- */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --primary: #38bdf8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --bg-color: #fef3e2;
+            --bg-secondary: #fff9f0;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --primary: #ff6b9d;
+            --primary-light: #ffb3d0;
+            --primary-dark: #ff3d7f;
+            --accent: #ffc107;
+            --accent-2: #4dabf7;
+            --success: #51cf66;
+            --warning: #ff9100;
+            --text-main: #2d3748;
+            --text-dim: #718096;
+            --border: rgba(255, 107, 157, 0.2);
+            --shadow: rgba(255, 107, 157, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,11 +30,12 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.15) 0px, transparent 50%);
+                radial-gradient(at 10% 20%, rgba(255, 193, 7, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(255, 107, 157, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(77, 171, 247, 0.1) 0px, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden; /* Mencegah scroll horizontal */
+            overflow-x: hidden;
         }
 
         /* --- 2. LOADING SCREEN STYLES (OVERLAY) --- */
@@ -38,13 +45,13 @@
             left: 0;
             width: 100%;
             height: 100vh;
-            background-color: var(--bg-color); /* Warna sama dengan dashboard */
-            z-index: 9999; /* Pastikan paling atas */
+            background: linear-gradient(135deg, #ffd6e8 0%, #fff4e6 50%, #e3f2fd 100%);
+            z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.5s ease; /* Efek fade out */
+            transition: opacity 0.5s ease;
         }
 
         .progress-wrapper {
@@ -61,88 +68,259 @@
             left: 0;
             transform: translateX(-50%);
             transition: left 0.1s linear;
-            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.6));
+            filter: drop-shadow(0 4px 10px rgba(255, 107, 157, 0.5));
         }
 
         /* Animasi Getar (Shake) */
         .shake { animation: shake-animation 0.2s infinite; }
         @keyframes shake-animation {
-            0% { transform: translateX(-50%) translateY(0); }
-            25% { transform: translateX(-52%) translateY(-2px); }
-            50% { transform: translateX(-50%) translateY(0); }
-            75% { transform: translateX(-48%) translateY(-2px); }
-            100% { transform: translateX(-50%) translateY(0); }
+            0% { transform: translateX(-50%) translateY(0) rotate(-5deg); }
+            25% { transform: translateX(-52%) translateY(-3px) rotate(0deg); }
+            50% { transform: translateX(-50%) translateY(0) rotate(5deg); }
+            75% { transform: translateX(-48%) translateY(-3px) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(0) rotate(-5deg); }
         }
 
         .progress-container {
             width: 100%;
-            height: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 50px;
-            padding: 3px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            padding: 4px;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
+            border: 2px solid rgba(255, 107, 157, 0.3);
         }
 
         .progress-bar {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--success));
+            background: linear-gradient(90deg, #ff6b9d, #ffc107, #4dabf7);
             border-radius: 50px;
-            box-shadow: 0 0 15px var(--primary);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
             transition: width 0.1s linear;
         }
 
         #loader-status {
-            color: var(--text-dim);
+            color: var(--primary-dark);
             text-align: center;
-            margin-top: 25px;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            font-weight: 600;
+            margin-top: 30px;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(255, 107, 157, 0.2);
         }
 
         /* --- 3. DASHBOARD STYLES --- */
         #dashboard-content {
-            display: none; /* Disembunyikan saat awal */
-            padding: 40px 20px; /* Padding dipindah ke sini */
+            display: none;
+            padding: 40px 20px;
             opacity: 0;
             transition: opacity 0.8s ease;
         }
 
         .container { max-width: 1100px; margin: 0 auto; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .header h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header p { color: var(--text-dim); font-size: 0.9rem; margin-top: 4px; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 40px;
+            padding: 35px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
+            border-radius: 28px;
+            border: 3px solid var(--border);
+            box-shadow: 0 8px 24px var(--shadow), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        }
+        .header h1 { 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .header p { 
+            color: var(--text-dim); 
+            font-size: 1rem; 
+            margin-top: 6px;
+            font-weight: 600;
+        }
         
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .stat-card { background: var(--card-bg); backdrop-filter: blur(12px); padding: 24px; border-radius: 20px; border: 1px solid var(--glass-border); transition: transform 0.3s ease; }
-        .stat-card:hover { transform: translateY(-5px); border-color: rgba(56, 189, 248, 0.3); }
-        .stat-card h3 { color: var(--text-dim); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-        .stat-card .number { font-size: 2rem; font-weight: 700; }
+        .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 24px; 
+            margin-bottom: 40px; 
+        }
+        .stat-card { 
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 24px;
+            border: 3px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 157, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        .stat-card:hover { 
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 12px 32px var(--shadow);
+        }
+        .stat-card h3 { 
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+        .stat-card .number { 
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
         
-        .orders-section { background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 24px; border: 1px solid var(--glass-border); padding: 30px; overflow: hidden; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .orders-section { 
+            background: var(--card-bg);
+            border-radius: 28px;
+            border: 3px solid var(--border);
+            padding: 40px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+        .section-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 35px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid rgba(255, 107, 157, 0.15);
+        }
         
-        .refresh-btn { background: var(--primary); color: #0f172a; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
-        .refresh-btn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        .refresh-btn { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .refresh-btn:hover { 
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.6);
+        }
+        .refresh-btn:active {
+            transform: translateY(0) scale(1);
+        }
         
         .table-wrapper { overflow-x: auto; }
-        .orders-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .orders-table th { padding: 16px; color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--glass-border); }
-        .orders-table td { padding: 16px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .orders-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+        .orders-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left;
+        }
+        .orders-table th { 
+            padding: 20px;
+            color: var(--primary-dark);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            border-bottom: 3px solid rgba(255, 107, 157, 0.2);
+            background: linear-gradient(to bottom, rgba(255, 245, 247, 0.5), transparent);
+            letter-spacing: 1px;
+        }
+        .orders-table td { 
+            padding: 20px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 107, 157, 0.1);
+        }
+        .orders-table tbody tr { 
+            transition: all 0.2s ease;
+        }
+        .orders-table tbody tr:hover { 
+            background: linear-gradient(to right, rgba(255, 107, 157, 0.05), rgba(255, 193, 7, 0.05));
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.1);
+        }
         
-        .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
-        .status-processed { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-badge { 
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        .status-processed { 
+            background: linear-gradient(135deg, #d3f9d8, #b2f2bb);
+            color: #2b8a3e;
+            border: 2px solid #51cf66;
+            box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
+        }
+        .status-pending { 
+            background: linear-gradient(135deg, #fff3bf, #ffe066);
+            color: #e67700;
+            border: 2px solid #ff9100;
+            box-shadow: 0 2px 8px rgba(255, 145, 0, 0.3);
+        }
         
-        .loading { text-align: center; padding: 40px; color: var(--text-dim); }
-        .error { color: #f87171; background: rgba(248, 113, 113, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .loading { 
+            text-align: center; 
+            padding: 60px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .error { 
+            color: #e03131; 
+            background: linear-gradient(135deg, #ffe0e0, #ffc9c9); 
+            padding: 18px; 
+            border-radius: 16px; 
+            margin-bottom: 20px;
+            border: 2px solid #ff6b6b;
+            font-weight: 600;
+        }
         
         @media (max-width: 600px) {
-            .header { flex-direction: column; text-align: center; gap: 20px; }
+            .header { flex-direction: column; text-align: center; gap: 20px; padding: 25px; }
             .section-header { flex-direction: column; gap: 15px; }
+            .stat-card { padding: 24px; }
+        }
+
+        /* Bounce Animation */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Floating Animation untuk emoji */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
         }
     </style>
 </head>
@@ -156,7 +334,7 @@
                 <div class="progress-bar" id="myBar"></div>
             </div>
             
-            <p id="loader-status">MENGHUBUNGKAN KE SERVER...</p>
+            <p id="loader-status">✨ MENGHUBUNGKAN KE SERVER... ✨</p>
         </div>
     </div>
 
@@ -164,43 +342,43 @@
         <div class="container">
             <header class="header">
                 <div>
-                    <h1>TOKO SUCI</h1>
+                    <h1>🌟 LKS KU 🌟</h1>
                     <p>System Monitoring Pesanan</p>
                 </div>
                 <button class="refresh-btn" onclick="loadOrders()">
-                    <span id="btn-icon">🔄</span> Refresh System
+                    <span id="btn-icon" style="font-size: 1.2rem;">🔄</span> Refresh System
                 </button>
             </header>
             
             <div class="stats">
                 <div class="stat-card">
-                    <h3>Total Pesanan</h3>
+                    <h3>📦 Total Pesanan</h3>
                     <div class="number" id="total-orders">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Pesanan Selesai</h3>
+                    <h3>✅ Pesanan Selesai</h3>
                     <div class="number" style="color: var(--success)" id="processed-orders">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Dalam Antrian</h3>
+                    <h3>⏳ Dalam Antrian</h3>
                     <div class="number" style="color: var(--warning)" id="pending-orders">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Uptime</h3>
-                    <div class="number" style="font-size: 1.1rem; color: var(--primary)" id="last-updated">--:--</div>
+                    <h3>⏰ Uptime</h3>
+                    <div class="number" style="font-size: 1.4rem; color: var(--accent-2)" id="last-updated">--:--</div>
                 </div>
             </div>
             
             <div class="orders-section">
                 <div class="section-header">
-                    <h2 style="font-size: 1.2rem;">Live Activity Feed</h2>
+                    <h2 style="font-size: 1.4rem; color: var(--primary-dark); font-weight: 800;">🎯 Live Activity Feed</h2>
                 </div>
                 
                 <div id="error-message"></div>
                 
                 <div class="table-wrapper">
                     <div id="orders-container">
-                        <div class="loading">Syncing with server...</div>
+                        <div class="loading">🔄 Syncing with server...</div>
                     </div>
                 </div>
             </div>
@@ -223,17 +401,17 @@
             while (width < 100) {
                 // Jeda di 30%
                 if (width === 30) {
-                    status.innerHTML = "SYSTEM LOADING: 30%";
+                    status.innerHTML = "✨ SYSTEM LOADING: 30% ✨";
                     img.classList.add("shake");
-                    await sleep(500);
+                    await sleep(250);
                     img.classList.remove("shake");
                 }
                 
                 // Jeda di 90%
                 if (width === 90) {
-                    status.innerHTML = "SYSTEM LOADING: 90%";
+                    status.innerHTML = "✨ SYSTEM LOADING: 90% ✨";
                     img.classList.add("shake");
-                    await sleep(750);
+                    await sleep(400);
                     img.classList.remove("shake");
                 }
 
@@ -243,16 +421,16 @@
                 
                 // Update teks status biasa
                 if(width !== 30 && width !== 90 && width !== 100) {
-                    status.innerHTML = "SYSTEM LOADING: " + width + "%";
+                    status.innerHTML = "✨ SYSTEM LOADING: " + width + "% ✨";
                 }
 
-                await sleep(30); // Kecepatan normal
+                await sleep(10); // Kecepatan normal
             }
 
-            status.innerHTML = "ON GOING!";
+            status.innerHTML = "🎉 ON GOING! 🎉";
             
             // Animasi Transisi ke Dashboard
-            await sleep(500); // Tunggu sebentar lihat 100%
+            await sleep(50); // Tunggu sebentar lihat 100%
             loaderOverlay.style.opacity = "0"; // Fade out loader
 
             setTimeout(() => {
@@ -277,9 +455,6 @@
             const container = document.getElementById('orders-container');
             const errorDiv = document.getElementById('error-message');
             
-            // Hapus pesan loading di sini agar tidak 'flicker' saat refresh otomatis
-            // container.innerHTML = '<div class="loading">Updating data...</div>';
-            
             fetch('/api/orders')
                 .then(response => response.json())
                 .then(data => {
@@ -287,18 +462,17 @@
                         displayOrders(data.orders);
                         updateStats(data.orders);
                         updateLastUpdated();
-                        errorDiv.innerHTML = ''; // Clear error jika sukses
+                        errorDiv.innerHTML = '';
                     } else {
                         throw new Error(data.error);
                     }
-                })
+                });
         }
-
 
         function displayOrders(orders) {
             const container = document.getElementById('orders-container');
             if (orders.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-dim);">No active processes found.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-dim); font-weight:600; font-size:1.1rem;">🎈 No active processes found 🎈</div>';
                 return;
             }
             
@@ -306,11 +480,11 @@
                 <table class="orders-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Source</th>
-                            <th>Event</th>
-                            <th>Status</th>
-                            <th>Time</th>
+                            <th>🆔 ID</th>
+                            <th>👤 Customer Name</th>
+                            <th>📝 Items</th>
+                            <th>📊 Status</th>
+                            <th>🕐 Time</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -325,11 +499,11 @@
 
                 tableHTML += `
                     <tr>
-                        <td style="font-family: monospace; color: var(--primary)">#${order.orderId ?? '-'}</td>
-                        <td style="font-weight: 600">${order.customerName ?? '-'}</td>
-                        <td style="color: var(--text-dim)">${order.items ?? '-'}</td>
+                        <td style="font-family: monospace; color: var(--primary-dark); font-weight: 800">#${order.orderId ?? '-'}</td>
+                        <td style="font-weight: 700; color: var(--text-main)">${order.customerName ?? '-'}</td>
+                        <td style="color: var(--text-dim); font-weight: 500">${order.items ?? '-'}</td>
                         <td><span class="status-badge ${statusClass}">${rawStatus.toUpperCase()}</span></td>
-                        <td style="font-size: 0.8rem; color: var(--text-dim)">${time}</td>
+                        <td style="font-size: 0.9rem; color: var(--text-dim); font-weight: 600">${time}</td>
                     </tr>
                 `;
             });
@@ -354,5 +528,3 @@
     </script>
 </body>
 </html>
-
-
